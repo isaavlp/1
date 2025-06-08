@@ -1,0 +1,232 @@
+#include <iostream>
+#include <fstream> // Para manejar archivos
+using namespace std;
+
+// Estructura ave
+struct datosAves {
+    int IDave; // Identificación de la ave
+    string NombreComun; // Nombre común de la ave
+    string NombreCientifico; // Nombre científico de la ave
+    string colorAve; // Color de la ave
+    int TamagnoAve; // Tamaño de la ave
+    string tipoAve; // Tipo de ave
+};
+
+// Estructura ornitólogo
+struct ornitologo {
+    string codigoOrnitologo; // Código del ornitólogo
+    string nombre; // Nombre del ornitólogo
+    string apellido; // Apellido del ornitólogo
+    int ID, edad; // Identificación y edad del ornitólogo
+    string nacionalidad; // Nacionalidad del ornitólogo
+    int cantAvesAvisualizar; // Cantidad de aves que el ornitólogo planea avistar
+    int cantAvesAvistadas; // Cantidad de aves que el ornitólogo ha avistado
+    datosAves AvesAvistadas[100]; // Arreglo de aves avistadas
+    double porcentajeAvistamiento; // Porcentaje de avistamiento por ornitólogo, es double para manejar decimales
+};
+
+// funciones prototipos
+void crearOrnitologo(ornitologo*); // Función para crear un ornitólogo
+bool buscarOrnitologo(ornitologo*, int, string, ornitologo&); // Función para buscar un ornitólogo por código
+void imprimirOrnitologoBuscado(ornitologo); // Función para imprimir los datos de un ornitólogo
+void reporteAvistamientos(ornitologo*, int); // Función para generar un reporte de avistamientos
+
+int main() {
+    const int max_ornitologos = 2; // Cantidad máxima de ornitólogos
+    ornitologo ListaOrnitologos[max_ornitologos]; // Arreglo para almacenar la información de los ornitólogos
+
+    int opcion; // Variable para almacenar la opción seleccionada en el menú
+    bool creadaLista = false; //para crear la lista de ornitólogos
+
+    // Menú principal
+    do {
+        cout << "\n----------------Bienvenido a SEO BirdLife----------------\n";
+        cout << "1. Crear Lista de Ornitólogos\n";
+        cout << "2. Imprimir datos del Ornitólogo (por código)\n";
+        cout << "3. Reporte de avistamientos\n";
+        cout << "4. Salir\n";
+        cout << "Seleccione opcion: ";
+        cin >> opcion; // Leer la opción del usuario
+
+        switch(opcion) {
+            case 1: // Opción para crear la lista de ornitólogos
+                for (int i = 0; i < max_ornitologos; i++) {
+                    cout << "Ingrese los datos del ornitologo #" << i + 1 << ":" << endl;
+                    crearOrnitologo(&ListaOrnitologos[i]); // Llamar a la función para crear un ornitólogo
+                }
+                creadaLista = true; // Marcar que la lista ha sido creada
+                break;
+            case 2: { // Opción para imprimir datos de un ornitólogo
+                if (!creadaLista) {
+                    cout << "Primero debe crear la lista de ornitologos (opcion 1).\n";
+                    break;
+                }
+                string codigo;
+                cout << "Ingrese el código del ornitólogo a buscar: ";
+                cin >> codigo; // Leer el código del ornitólogo
+                ornitologo encontrado; // Variable para almacenar el ornitólogo encontrado
+                if (buscarOrnitologo(ListaOrnitologos, max_ornitologos, codigo, encontrado)) {
+                    imprimirOrnitologoBuscado(encontrado); // Imprimir los datos del ornitólogo encontrado
+                }
+                else {
+                    cout << "Ornitólogo con código " << codigo << " no encontrado.\n"; // Mensaje si no se encuentra
+                }
+                break;
+            }
+            case 3: // Opción para generar un reporte de avistamientos
+                if (!creadaLista) {
+                    cout << "Primero debe crear la lista de ornitologos (opcion 1).\n";
+                    break;
+                }
+                reporteAvistamientos(ListaOrnitologos, max_ornitologos); // reporte
+                break;
+            case 4: // Opción para salir del programa
+                cout << "Saliendo del programa...\n";
+                break;
+            default: // default para sea cual sea la opción que no coincida con los casos que ya estan definidos 
+                cout << "Opcion no valida, intente nuevamente.\n";
+        }
+    } while (opcion != 4); // Repetir hasta que el usuario elija salir (ahora opción 4)
+
+    return 0; // Fin del programa
+}
+
+// Función para crear un ornitólogo
+void crearOrnitologo(ornitologo* Lista) { 
+    cout << "Codigo del ornitologo: \n";
+    cin >> Lista->codigoOrnitologo; // Leer el código del ornitólogo
+    cout << "Nombre: \n";
+    cin >> Lista->nombre; // Leer el nombre del ornitólogo
+    cout << "Apellido: \n";
+    cin >> Lista->apellido; // Leer el apellido del ornitólogo
+    cout << "Numero de Identificacion: \n";
+    cin >> Lista->ID; // Leer la identificación del ornitólogo
+    cout << "Edad: \n";
+    cin >> Lista->edad; // Leer la edad del ornitólogo
+    cout << "Nacionalidad: \n";
+    cin >> Lista->nacionalidad; // Leer la nacionalidad del ornitólogo
+    cout << "Cantidad de aves a Avistar: \n";
+    cin >> Lista->cantAvesAvisualizar; // Leer la cantidad de aves a avistar
+    cout << "Cantidad de aves avistadas: \n";  
+    cin >> Lista->cantAvesAvistadas; // Leer la cantidad de aves avistadas
+
+    // Ciclo para ingresar los datos de cada ave avistada
+    for (int i = 0; i < (Lista->cantAvesAvistadas); i++) {
+        cout << "---------------------------------------\n";
+        cout << " Ingreso de datos de la Ave #" << i + 1 << " : " << endl;
+        cout << "---------------------------------------\n";
+        cout << "ID de la Ave: \n";
+        cin >> Lista->AvesAvistadas[i].IDave; // Leer ID de la ave
+        cout << "Nombre Comun: \n";
+        cin >> Lista->AvesAvistadas[i].NombreComun; // Leer nombre común de la ave
+        cout << "Nombre Cientifico: \n";
+        cin >> Lista->AvesAvistadas[i].NombreCientifico; // Leer nombre científico de la ave
+        cout << "Color de la Ave: \n";
+        cin >> Lista->AvesAvistadas[i].colorAve; // Leer color de la ave
+        cout << "Tamanno de la Ave: \n";
+        cin >> Lista->AvesAvistadas[i].TamagnoAve; // Leer tamaño de la ave
+        cout << "Tipo de Ave: \n";
+        cin >> Lista->AvesAvistadas[i].tipoAve; // Leer tipo de ave
+    }
+    // Calculo del porcentaje de avistamiento
+    if (Lista->cantAvesAvisualizar > 0)
+        Lista->porcentajeAvistamiento = ((double)Lista->cantAvesAvistadas * 100.0) / Lista->cantAvesAvisualizar; // Calcular porcentaje
+    else
+        Lista->porcentajeAvistamiento = 0.0; // Si no hay aves a visualizar, el porcentaje es 0
+}
+
+// Función para buscar un ornitólogo por su código
+bool buscarOrnitologo(ornitologo* lista, int max_ornitologos, string codigoOrnit, ornitologo& Encontrado) { 
+    for (int i = 0; i < max_ornitologos; i++) { 
+        if (lista[i].codigoOrnitologo == codigoOrnit) { // Comparar el código
+            Encontrado = lista[i]; // Guardar el ornitólogo encontrado
+            return true; // Retornar verdadero si se encuentra
+        }
+    }
+    return false; // Retornar falso si no se encuentra
+}
+
+// Función para imprimir los datos de un ornitólogo
+void imprimirOrnitologoBuscado(ornitologo O) { 
+    cout << "----------------------------------\n";
+    cout << "           SEO BirdLife           \n";
+    cout << "----------------------------------\n";
+    cout << endl;
+    cout << "Nombre: " << O.nombre << endl;
+    cout << "Apellido: " << O.apellido << endl;
+    cout << "Identificacion: " << O.ID << endl;
+    cout << "Edad: " << O.edad << endl;
+    cout << "Nacionalidad: " << O.nacionalidad << endl;
+    cout << "Codigo de Ornitologo: " << O.codigoOrnitologo << endl;
+    cout << "Cantidad de aves a Avistar: " << O.cantAvesAvisualizar << endl;
+    cout << "Cantidad de aves avistadas: " << O.cantAvesAvistadas << endl;
+    cout << "Porcentaje de avistamiento: " << O.porcentajeAvistamiento << endl; // Imprimir porcentaje
+    cout << endl;
+
+    cout << "----------------------------------\n";
+    cout << "          Lista de Aves\n";
+    cout << "----------------------------------\n";
+    for (int i = 0; i < (O.cantAvesAvistadas); i++) {
+        cout << "ID de la Ave: " << O.AvesAvistadas[i].IDave << endl;
+        cout << "Nombre Comun: " << O.AvesAvistadas[i].NombreComun << endl;
+        cout << "Nombre Cientifico: " << O.AvesAvistadas[i].NombreCientifico << endl;
+        cout << "Color de la Ave: " << O.AvesAvistadas[i].colorAve << endl;
+        cout << "Tamanno de la Ave: " << O.AvesAvistadas[i].TamagnoAve << endl;
+        cout << "Tipo de Ave: " << O.AvesAvistadas[i].tipoAve << endl;
+        cout << "----------------------------------\n";
+        cout << endl;
+    }
+
+    // Guardar información en archivo con nombre codigoOrnitologo.txt
+    ofstream archivo(O.codigoOrnitologo  +".txt");
+    if (archivo.is_open()) {
+        archivo << "----------------SEO BirdLife----------------\n";
+        archivo << "Nombre: " << O.nombre << "\n";
+        archivo << "Apellido: " << O.apellido << "\n";
+        archivo << "Identificacion: " << O.ID << "\n";
+        archivo << "Edad: " << O.edad << "\n";
+        archivo << "Nacionalidad: " << O.nacionalidad << "\n";
+        archivo << "Codigo de Ornitologo: " << O.codigoOrnitologo << "\n";
+        archivo << "Cantidad de aves a Avistar: " << O.cantAvesAvisualizar << "\n";
+        archivo << "Cantidad de aves avistadas: " << O.cantAvesAvistadas << "\n";
+        archivo << "Porcentaje de avistamiento: " << O.porcentajeAvistamiento << "\n";
+        archivo << "\n--Lista de Aves--\n";
+        for (int i = 0; i < (O.cantAvesAvistadas); i++) {
+            archivo << "ID de la Ave: " << O.AvesAvistadas[i].IDave << "\n";
+            archivo << "Nombre Comun: " << O.AvesAvistadas[i].NombreComun << "\n";
+            archivo << "Nombre Cientifico: " << O.AvesAvistadas[i].NombreCientifico << "\n";
+            archivo << "Color de la Ave: " << O.AvesAvistadas[i].colorAve << "\n";
+            archivo << "Tamanno de la Ave: " << O.AvesAvistadas[i].TamagnoAve << "\n";
+            archivo << "Tipo de Ave: " << O.AvesAvistadas[i].tipoAve << "\n";
+            archivo << "-------------------------------\n";
+        }
+        archivo.close(); // Cerrar el archivo
+    } else {
+        cout << "No se pudo abrir el archivo para guardar.\n"; // Mensaje de error si no se puede abrir el archivo
+    }
+}
+
+// Función para generar un reporte de avistamientos
+void reporteAvistamientos(ornitologo* lista, int max_ornitologos) {
+    if (max_ornitologos <= 0) return; // Verificar que haya ornitólogos
+    ornitologo* maxPorc = &lista[0]; // Inicializar el puntero al ornitólogo con el mayor porcentaje
+    ornitologo* minPorc = &lista[0]; // Inicializar el puntero al ornitólogo con el menor porcentaje
+    for (int i = 1; i < max_ornitologos; i++) {
+        if (lista[i].porcentajeAvistamiento > maxPorc->porcentajeAvistamiento)
+            maxPorc = &lista[i]; // Actualizar el puntero al ornitólogo con el mayor porcentaje
+        if (lista[i].porcentajeAvistamiento < minPorc->porcentajeAvistamiento)
+            minPorc = &lista[i]; // Actualizar el puntero al ornitólogo con el menor porcentaje
+    }
+    ofstream archivo("reporte_avistamientos.txt"); // Crear archivo para el reporte
+    if (archivo.is_open()) {
+        archivo << "Ornitólogo con el porcentaje de avistamiento más alto:\n";
+        archivo << "Nombre: " << maxPorc->nombre << ", Codigo: " << maxPorc->codigoOrnitologo << ", Porcentaje: " << maxPorc->porcentajeAvistamiento << "\n";
+        archivo << "Ornitólogo con el porcentaje de avistamiento más bajo:\n";
+        archivo << "Nombre: " << minPorc->nombre << ", Codigo: " << minPorc->codigoOrnitologo << ", Porcentaje: " << minPorc->porcentajeAvistamiento << "\n";
+        archivo.close(); // Cerrar el archivo
+        cout << "Reporte de avistamientos generado en 'reporte_avistamientos.txt'\n"; // Mensaje de éxito
+    } else {
+        cout << "Error al abrir archivo para reporte.\n"; // Mensaje de error si no se puede abrir el archivo
+    }
+}
+
